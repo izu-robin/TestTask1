@@ -21,20 +21,13 @@ namespace TestTask1.Classes
         public virtual void ActionsTree()
         {
             Console.Write("\n Введите номер действия: ");
-
-
         }
-
-        //public virtual void ShowAllTasks()
-        //{
-
-        //}
 
         public Employee() {}
 
-        public Employee(string Login)
+        public Employee(string login)
         {
-            Login = Login;
+            Login = login;
             //Password = Password;
         }
 

@@ -9,6 +9,8 @@ namespace TestTask1.Classes
 {
     public class Worker : Employee
     {
+        List<Task> usersTasks = new List<Task>();
+
         public Worker() {  }
         public Worker(string log, string pass) : base(log) { }
 
@@ -45,7 +47,7 @@ namespace TestTask1.Classes
                         continue;
                     }
 
-                    if (answer > 0 && answer < 4)
+                    if (answer > 0 && answer < 5)
                     {
                         success = true;
                     }
@@ -79,9 +81,15 @@ namespace TestTask1.Classes
             }
         }
 
-        public static void CheckMyTasks()
+        public void CheckMyTasks()
         {
+            List<Task> myTasks = DBDataAccess.FindPersonalTasks(this.Id);
 
+            foreach (Task t in myTasks)
+            {
+                t.PrintTask();
+                Console.WriteLine();
+            }
         }
 
         public static void ChangeStatus()
