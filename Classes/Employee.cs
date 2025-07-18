@@ -10,12 +10,25 @@ namespace TestTask1.Classes
     {
         public int Id { get; set; }
         public string Login { get; set; }
-        //public string Password { get; set; }
+        public string Password { get; set; }
 
-        public virtual void ShowAllTasks()
+
+        public virtual void ShowActions()
         {
+            Console.WriteLine("\n\t Выберите действие: ");
+        }
+
+        public virtual void ActionsTree()
+        {
+            Console.Write("\n Введите номер действия: ");
+
 
         }
+
+        //public virtual void ShowAllTasks()
+        //{
+
+        //}
 
         public Employee() {}
 

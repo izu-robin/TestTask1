@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,13 +23,14 @@ namespace TestTask1.Classes
             //Console.WriteLine("\t связь с базой установлена");
         }
 
+
         public static Employee Authorize( ref int isWorker)
         {
-            Employee found = new Employee();
             int success = 0;
 
             string login = "";
             string password = "";
+            int id;
 
             while (success != 1)
             {
@@ -46,7 +48,7 @@ namespace TestTask1.Classes
                 success = 1;
             }
 
-            string sql = "SELECT Employees.isWorker, Employees.id, Employees.login FROM Employees WHERE login = @login AND password = @password";
+            string sql = "SELECT Employees.isWorker, Employees.id, Employees.login, Employees.password FROM Employees WHERE login = @login AND password = @password";
             string connectionString = Instance.ConnectionString;
 
             try
@@ -74,9 +76,9 @@ namespace TestTask1.Classes
                             isWorker = 0;
                         }
 
-                        found.Id = reader.GetInt32(1);
-                        found.Login = reader.GetString(2);
-
+                        id = reader.GetInt32(1);
+                        login=reader.GetString(2);
+                        password=reader.GetString(3);
                     }
 
                     SQLiteConnection.Close();
@@ -84,11 +86,50 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Пользователь не авторизирован: {ex.Message}");
             }
+
+            var found = EmployeeFactory.CreateEmployee(login, password, isWorker);
 
             return found;
         }
+
+        public static void SaveNewEmployee(Employee e, int isWorker)
+        {
+            string sql = "INSERT INTO Employees (login, password, isWorker) VALUES (@login, @password, @isWorker)";
+            string connectionString = Instance.ConnectionString;
+
+            try
+            {
+                using (SQLiteConnection SQLiteConnection = new SQLiteConnection(connectionString))
+                {
+                    SQLiteConnection.Open();
+
+                    using (SQLiteCommand command = new SQLiteCommand(sql, SQLiteConnection))
+                    {
+                        command.Parameters.AddWithValue("@login", e.Login);
+                        command.Parameters.AddWithValue("@password", e.Password);
+                        command.Parameters.AddWithValue("@isWorker", isWorker);
+
+                        command.ExecuteNonQuery();
+                    }
+
+                    SQLiteConnection.Close();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Не удалось сохранить нового сотрудника в базу данных: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
+
+
 
             static void AddNewManager() //сырое из первых попыток, но по итогу работает. 
             {        //абсолютная ссылка

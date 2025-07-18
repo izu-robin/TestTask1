@@ -7,35 +7,24 @@ namespace ProjectsManagingSystem
 {
     class Program
     {
-        enum workerStatus { Менеджер = 0, Работник = 1 }
         public static void Main()
         {
             int isWorker = -1;
-            
-            Employee SignedUser = new Employee();
-
-            SignedUser = DBDataAccess.Authorize(ref isWorker);
+           
+            var SignedUser = DBDataAccess.Authorize(ref isWorker);
 
             while (isWorker == -1)
             {
-                Console.WriteLine("\n Пользователь не найден, повторите вход. \n");
+                Console.WriteLine("\n\t Пользователь не найден, повторите вход. \n");
                 SignedUser = DBDataAccess.Authorize(ref isWorker);
             }
 
             Console.WriteLine($"\n\t Добро пожаловать! \n\t пользователь #{SignedUser.Id}, {SignedUser.Login}");
 
+            Console.WriteLine(isWorker==0 ? "\t Статус: менеджер \n" : "\t Статус: сотрудник \n");
 
-
-            //switch и вот здесь здоровый свитч со всеми командами и вот этим всем. 
-            //вот это уже в него
-            if (isWorker == 1)
-            {
-                Console.WriteLine($"\n\t Статус: сотрудник");
-            }
-            else
-            {
-                Console.WriteLine($"\n\t Статус: менеджер");
-            }
+            SignedUser.ShowActions();
+            SignedUser.ActionsTree();
 
         }
 
