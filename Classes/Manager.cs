@@ -66,52 +66,51 @@ namespace TestTask1.Classes
                 switch (answer)
                 {
                     case 1:
-                        Console.WriteLine(" 1: Добавить сотрудника");   //сделано
+                        Console.WriteLine(" 1: Добавить сотрудника");   // 
                         CreateNewEmployee();
                         break;
 
                     case 2:
-                        Console.WriteLine(" 2: Добавить задачу");   //сделано
+                        Console.WriteLine(" 2: Добавить задачу");   // 
                         CreateNewTask();
                         break;
 
                     case 3:
-                        Console.WriteLine(" 3: Присвоить задачу сотруднику");  //сделано
+                        Console.WriteLine(" 3: Присвоить задачу сотруднику");  // 
                         AssignTask();
                         break;
 
                     case 4:
-                        Console.WriteLine(" 4: Удалить задачу"); //сделано
+                        Console.WriteLine(" 4: Удалить задачу"); // 
                         DeleteTask();
                         break;
 
                     case 5:
-                        Console.WriteLine(" 5: Удалить сотрудника"); //сделано
+                        Console.WriteLine(" 5: Удалить сотрудника"); // 
                         DeleteEmployee();
                         break;
 
                     case 6:
-                        Console.WriteLine(" 6: Просмотреть историю действий работников");
+                        Console.WriteLine(" 6: Просмотреть историю действий работников"); // 
                         ShowActivityLog();
                         break;
 
                     case 7:
-                        Console.WriteLine(" 7: Просмотреть доступные действия"); //сделано
-                        this.ShowActions(); 
+                        Console.WriteLine(" 7: Просмотреть доступные действия"); // 
                         break;
 
                     case 8:
-                        Console.WriteLine(" 8: Просмотреть все задачи"); //сделано
+                        Console.WriteLine(" 8: Просмотреть все задачи"); // 
                         ShowAllTasks();
                         break;
 
                     case 9:
-                        Console.WriteLine(" 9: Просмотреть всех сотрудников"); //сделано
+                        Console.WriteLine(" 9: Просмотреть всех сотрудников"); // 
                         ShowAllWorkers();
                         break;
 
                     case 10:
-                        Console.WriteLine(" 10: Завершить работу"); //сделано
+                        Console.WriteLine(" 10: Завершить работу"); // 
                         break;
                 }
             }
@@ -150,7 +149,6 @@ namespace TestTask1.Classes
             //и сохраняем в базу данных 
             DBDataAccess.SaveNewEmployee(newEmployee, isWorker);
 
-            Console.WriteLine("Новый сотрудник добавлен.");
         }
 
         public static void CreateNewTask()
@@ -374,7 +372,7 @@ namespace TestTask1.Classes
 
         public static void ShowActivityLog()
         {
-
+            DBDataAccess.ReadLog();
         }
 
         public static void  ShowAllWorkers()

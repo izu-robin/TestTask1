@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Data.Entity.Infrastructure.Design.Executor;
@@ -123,12 +124,15 @@ namespace TestTask1.Classes
                 if (ex.Message == "constraint failed\r\nUNIQUE constraint failed: Employees.login")
                 {
                     Console.WriteLine("Такой логин уже занят. Выберите другой логин и повторите операцию. ");
+                    return;
                 }
                 else
                 {
                     Console.WriteLine($"Не удалось сохранить нового сотрудника в базу данных: {ex.Message}");
                 }
             }
+
+            Console.WriteLine("Новый сотрудник добавлен.");
         }
 
         public static bool CheckExistingEmployee(int id)
@@ -476,61 +480,179 @@ namespace TestTask1.Classes
 
         }
 
+        public static void UpdateTaskStatus(int taskId, int status, int workerId)
+        {
 
+            string connectionString = Instance.ConnectionString;
+            string sql = "UPDATE Tasks SET Status = @Status WHERE Id = @Id";
 
-        //------------------------------------------ удалить потом надо, пока что справочныйф угол ------------------------------------
-        static void AddNewManager() //сырое из первых попыток, но по итогу работает. 
-            {        //абсолютная ссылка
-                     //string ConnectionString = @"Data Source=L:\Programming\Codin\C#\TestTask1\ManagingSystemDB.db";
-
-                // блять это абсолютная ссылка на дебажную версию
-                string baseDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-                // и строим абсолютную ссылку с подобранной директорией
-                string dbPath = Path.Combine(baseDirectory, "ManagingSystemDB.db");
-
-                //string ConnectionString = @"Data Source=ManagingSystemDB.db;FailIfMissing=True";
-                //{dbPath}
-
-
-                string dbfile = @"URI=file:ManagingSystemDB.db";     // еще такой вариант, тоже все в дебажную версию
-                SQLiteConnection connection = new SQLiteConnection(dbfile);
-
-
-                string addManager = @"INSERT INTO Managers (login, password) 
-                                  VALUES (@Login, @Password)";
-
-
-
-                try //вот сюда включать всё что работает с базой данных
+            try
+            {
+                using (SQLiteConnection SQLiteConnection = new SQLiteConnection(connectionString))
                 {
-                    using (SQLiteConnection SQLiteConnection = new SQLiteConnection(dbfile))
+                    SQLiteConnection.Open();
+
+                    using (SQLiteCommand command = new SQLiteCommand(sql, SQLiteConnection))
                     {
-                        SQLiteConnection.Open();
+                        command.Parameters.AddWithValue("@Status", status);
+                        command.Parameters.AddWithValue("@Id", taskId);
 
-                        using (SQLiteCommand command = new SQLiteCommand(addManager, SQLiteConnection))
-                        {
-                            command.Parameters.AddWithValue("@Login", "admin1");
-                            command.Parameters.AddWithValue("@Password", "passwoord");
+                        command.ExecuteNonQuery();
 
-                            int rowsChanged = command.ExecuteNonQuery();
-                            Console.WriteLine($"Изменена {rowsChanged} строка");
-                        }
-
-                        Console.WriteLine("Creation succeeded!");
-                        SQLiteConnection.Close();
-                        Console.Read();
                     }
-                }
-                catch (SQLiteException ex)
-                {
-                    if (ex.Message == "constraint failed\r\nUNIQUE constraint failed: Managers.login")
-                        Console.WriteLine("Такой логин уже занят. Повторите ввод: ");
-                    else
-                        Console.WriteLine($"Ошибка подключения базы данных: {ex.Message}");
+                    //SQLiteConnection.Close();
 
+                    Console.WriteLine("Задача обновлена.");
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            LogAction(new Action(workerId, taskId, DateTime.Now.ToString(), status));
+        }
+
+        public static void LogAction(Action a)
+        {
+            string connectionString = Instance.ConnectionString;
+
+            string sql = "INSERT INTO Actions (workerId, taskId, NewStatus, ActionTime) VALUES (@workerId, @taskId, @NewStatus, @ActionTime)";
+
+            try
+            {
+                using (SQLiteConnection SQLiteConnection = new SQLiteConnection(connectionString))
+                {
+                    SQLiteConnection.Open();
+                    using (SQLiteCommand command = new SQLiteCommand(sql, SQLiteConnection))
+                    {
+                        command.Parameters.AddWithValue("@workerId", a.WorkerId);
+                        command.Parameters.AddWithValue("@taskId", a.TaskId);
+                        command.Parameters.AddWithValue("@NewStatus", a.NewStatus);
+                        command.Parameters.AddWithValue("@ActionTime", a.ActionTime);
+
+                        command.ExecuteNonQuery();
+                    }
+                    SQLiteConnection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Console.WriteLine($"Задача #{a.TaskId} получила статус {Task.ReturnStatus(a.NewStatus)}");
+            Console.WriteLine($"Изменение сохранено в истории действий.");
+        }
+
+        public static void ReadLog()
+        {
+            List<Action> actionLog = new List<Action>();
+
+            string connectionString = Instance.ConnectionString;
+            string sql = "SELECT Actions.id, Actions.ActionTime, Actions.taskId, Tasks.Title, Actions.newStatus, Actions.workerId, Employees.login FROM (Employees JOIN Tasks ON Employees.id=Tasks.workerId) JOIN Actions ON Tasks.id=Actions.taskId";
+
+            try
+            {
+                using (SQLiteConnection SQLiteConnection = new SQLiteConnection(connectionString))
+                {
+                    SQLiteConnection.Open();
+
+                    using (SQLiteCommand command = new SQLiteCommand(sql, SQLiteConnection))
+                    {
+                        using var reader = command.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            Action a = new Action();
+                            a.Id = reader.GetInt32(0);
+                            a.ActionTime = reader.GetString(1);
+                            a.TaskId = reader.GetInt32(2);
+                            a.Title=reader.GetString(3);
+                            a.NewStatus = reader.GetInt32(4);
+                            a.WorkerId= reader.GetInt32(5);
+                            a.WorkerLogin= reader.GetString(6); 
+
+                            actionLog.Add(a);
+                        }
+
+                        reader.Close();
+                    }
+
+                    SQLiteConnection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            if(actionLog.Count == 0)
+            {
+                Console.WriteLine("\n\t История действий пуста. \n");
+                return;
+            }    
+
+            foreach(Action a in actionLog)
+            {
+                a.PrintAction();
+            }
+
+        }
+
+        ////------------------------------------------ удалить потом надо, пока что справочныйф угол ------------------------------------
+        //static void AddNewManager() //сырое из первых попыток, но по итогу работает. 
+        //    {        //абсолютная ссылка
+        //             //string ConnectionString = @"Data Source=L:\Programming\Codin\C#\TestTask1\ManagingSystemDB.db";
+
+        //        // блять это абсолютная ссылка на дебажную версию
+        //        string baseDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+        //        // и строим абсолютную ссылку с подобранной директорией
+        //        string dbPath = Path.Combine(baseDirectory, "ManagingSystemDB.db");
+
+        //        //string ConnectionString = @"Data Source=ManagingSystemDB.db;FailIfMissing=True";
+        //        //{dbPath}
+
+
+        //        string dbfile = @"URI=file:ManagingSystemDB.db";     // еще такой вариант, тоже все в дебажную версию
+        //        SQLiteConnection connection = new SQLiteConnection(dbfile);
+
+
+        //        string addManager = @"INSERT INTO Managers (login, password) 
+        //                          VALUES (@Login, @Password)";
+
+
+
+        //        try //вот сюда включать всё что работает с базой данных
+        //        {
+        //            using (SQLiteConnection SQLiteConnection = new SQLiteConnection(dbfile))
+        //            {
+        //                SQLiteConnection.Open();
+
+        //                using (SQLiteCommand command = new SQLiteCommand(addManager, SQLiteConnection))
+        //                {
+        //                    command.Parameters.AddWithValue("@Login", "admin1");
+        //                    command.Parameters.AddWithValue("@Password", "passwoord");
+
+        //                    int rowsChanged = command.ExecuteNonQuery();
+        //                    Console.WriteLine($"Изменена {rowsChanged} строка");
+        //                }
+
+        //                Console.WriteLine("Creation succeeded!");
+        //                SQLiteConnection.Close();
+        //                Console.Read();
+        //            }
+        //        }
+        //        catch (SQLiteException ex)
+        //        {
+        //            if (ex.Message == "constraint failed\r\nUNIQUE constraint failed: Managers.login")
+        //                Console.WriteLine("Такой логин уже занят. Повторите ввод: ");
+        //            else
+        //                Console.WriteLine($"Ошибка подключения базы данных: {ex.Message}");
+
+        //        }
+        //    }
         
 
 

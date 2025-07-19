@@ -17,7 +17,7 @@ namespace TestTask1.Classes
         public string ActionTime { get; set; }
 
         private int _newStatus = 0;
-        int NewStatus 
+        public int NewStatus 
         {
            get => _newStatus;
 
@@ -28,9 +28,9 @@ namespace TestTask1.Classes
         }
 
         public Action() { }
-        public Action(int id, int workerId, int taskId, string actionTime, int newStatus)
+        public Action( int workerId, int taskId, string actionTime, int newStatus)
         {
-            Id=id;
+
             WorkerId=workerId;
             TaskId=taskId;
             ActionTime=actionTime;
@@ -39,7 +39,7 @@ namespace TestTask1.Classes
 
         public void PrintAction()
         {
-            Console.WriteLine($"\n\t {this.ActionTime} \n\t Работник [{this.WorkerId}, {this.WorkerLogin}] изменил статус задачи #{this.TaskId} на \"{Task.ReturnStatus(this.NewStatus)}\"\n\t ");
+            Console.WriteLine($"\n\t {this.ActionTime} \n\t Работник [{this.WorkerId}, {this.WorkerLogin}] изменил статус задачи #{this.TaskId}[{this.Title}] на \"{Task.ReturnStatus(this.NewStatus)}\"\n\t ");
         }
     }
 }
