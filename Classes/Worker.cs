@@ -18,10 +18,14 @@ namespace TestTask1.Classes
         {
             base.ShowActions();
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
             Console.WriteLine("1: Просмотреть мои задачи");
             Console.WriteLine("2: Изменить статус задачи");
             Console.WriteLine("3: Просмотреть доступные действия");
             Console.WriteLine("4: Завершить работу");
+
+            Console.ForegroundColor = ConsoleColor.White;
 
         }
 
@@ -43,7 +47,9 @@ namespace TestTask1.Classes
                     }
                     catch (Exception ex)
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Ошибка ввода. Используйте только указанные выше номера вариантов. Повторите ввод числа: ");
+                        Console.ForegroundColor = ConsoleColor.White;
                         continue;
                     }
 
@@ -53,31 +59,32 @@ namespace TestTask1.Classes
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Некорректный выбор. Повторите ввод:");
+                        Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
 
                 switch (answer)
                 {
                     case 1:
-                        Console.WriteLine("1: Просмотреть мои задачи"); // 
+                        Console.WriteLine("1: Просмотреть мои задачи"); 
                         CheckMyTasks();
                         break;
 
                     case 2:
-                        Console.WriteLine("2: Изменить статус задачи"); // 
+                        Console.WriteLine("2: Изменить статус задачи");
                         ChangeStatus();
                         break;
 
                     case 3:
-                        Console.WriteLine("3: Просмотреть доступные действия"); // 
+                        Console.WriteLine("3: Просмотреть доступные действия"); 
                         this.ShowActions();
                         break;
 
                     case 4:
-                        Console.WriteLine("4: Завершить работу"); // 
+                        Console.WriteLine("4: Завершить работу"); 
                         break;
-
                 }
             }
         }
@@ -108,8 +115,6 @@ namespace TestTask1.Classes
                 return;
             }
 
-            //int answer=-1;
-
             int tId = -1;
             bool success = false;
             int[] taskIds = new int[workersTasks.Count];
@@ -119,13 +124,13 @@ namespace TestTask1.Classes
                 taskIds[i] = workersTasks[i].Id;
             }
 
-            Console.WriteLine("ваши задачи: ");
+            Console.Write("\t Ваши задачи: ");
             foreach (int i in taskIds)
             {
                 Console.Write($"{i} ");
             }
 
-            Console.WriteLine("\t Выберите задачу для изменения статуса: ");
+            Console.WriteLine("\n\t Выберите задачу для изменения статуса: ");
 
             while (!success)
             {
@@ -136,25 +141,30 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Используйте только указанные выше номера вариантов. Повторите ввод числа: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                     continue;
                 }
 
                 if (taskIds.Any( t => t == tId)) 
                 {
                     success = true;
-                    Console.WriteLine("у вас есть такая задача");
+
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Некорректный выбор. Повторите ввод:");
+                    Console.ForegroundColor = ConsoleColor.White;
+
                 }
             }
 
             success = false;
             int status = -1;
 
-            Console.WriteLine($"Выберите новый статус задачи {tId}");
+            Console.WriteLine($"\nВыберите новый статус задачи {tId}");
             Console.WriteLine("0 - to do, 1 - in progress, 2 - done): ");
             while (!success)
             {
@@ -167,16 +177,25 @@ namespace TestTask1.Classes
                     }
                     catch (Exception ex)
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Ошибка ввода. Используйте только указанные выше номера вариантов. Повторите ввод числа: ");
+                        Console.ForegroundColor = ConsoleColor.White;
                         continue;
                     }
 
                     if (!(status == 0 || status == 1 || status == 2))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Ошибка ввода. Введите 0, 1 или 2: ");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                        
 
                     if(workersTasks.Any(t => t.Id==tId && t.Status==status))
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"Задача #{tId} уже имеет статус {Task.ReturnStatus(status)}");
+                        Console.ForegroundColor = ConsoleColor.White;
                         return;
                     }
                 }
@@ -184,9 +203,6 @@ namespace TestTask1.Classes
             }
 
             DBDataAccess.UpdateTaskStatus(tId, status, this.Id);
-
-
-
         }
 
     }

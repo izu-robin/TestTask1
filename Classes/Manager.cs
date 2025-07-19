@@ -18,6 +18,8 @@ namespace TestTask1.Classes
         {
             base.ShowActions();
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
             Console.WriteLine("1: Добавить сотрудника");
             Console.WriteLine("2: Добавить задачу");
             Console.WriteLine("3: Присвоить задачу сотруднику");
@@ -26,9 +28,10 @@ namespace TestTask1.Classes
             Console.WriteLine("6: Просмотреть историю действий работников");
             Console.WriteLine("7: Просмотреть доступные действия");
             Console.WriteLine("8: Просмотреть все задачи");
-            Console.WriteLine("9: Просмотреть всех сотрудников");
+            Console.WriteLine("9: Просмотреть всех работников");
             Console.WriteLine("10: Завершить работу");
 
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public override void ActionsTree()
@@ -49,7 +52,9 @@ namespace TestTask1.Classes
                     }
                     catch (Exception ex)
                     {
+                        Console.ForegroundColor= ConsoleColor.Red;
                         Console.WriteLine("Ошибка ввода. Используйте только указанные выше номера вариантов. Повторите ввод числа: ");
+                        Console.ForegroundColor = ConsoleColor.White;
                         continue;
                     }
 
@@ -59,58 +64,61 @@ namespace TestTask1.Classes
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Некорректный выбор. Повторите ввод:");
+                        Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
 
                 switch (answer)
                 {
                     case 1:
-                        Console.WriteLine(" 1: Добавить сотрудника");   // 
+                        Console.WriteLine("\n 1: Добавить сотрудника \n");   
                         CreateNewEmployee();
                         break;
 
                     case 2:
-                        Console.WriteLine(" 2: Добавить задачу");   // 
+                        Console.WriteLine("\n 2: Добавить задачу \n");   
                         CreateNewTask();
                         break;
 
                     case 3:
-                        Console.WriteLine(" 3: Присвоить задачу сотруднику");  // 
+                        Console.WriteLine("\n 3: Присвоить задачу сотруднику \n"); 
                         AssignTask();
                         break;
 
                     case 4:
-                        Console.WriteLine(" 4: Удалить задачу"); // 
+                        Console.WriteLine("\n 4: Удалить задачу \n");  
                         DeleteTask();
                         break;
 
                     case 5:
-                        Console.WriteLine(" 5: Удалить сотрудника"); // 
+                        Console.WriteLine("\n 5: Удалить сотрудника \n"); 
                         DeleteEmployee();
                         break;
 
                     case 6:
-                        Console.WriteLine(" 6: Просмотреть историю действий работников"); // 
+                        Console.WriteLine("\n 6: Просмотреть историю действий работников \n");  
                         ShowActivityLog();
                         break;
 
                     case 7:
-                        Console.WriteLine(" 7: Просмотреть доступные действия"); // 
+                        Console.WriteLine("\n 7: Просмотреть доступные действия \n");  
+                        ShowActions();
                         break;
 
                     case 8:
-                        Console.WriteLine(" 8: Просмотреть все задачи"); // 
+                        Console.WriteLine("\n 8: Просмотреть все задачи \n"); 
                         ShowAllTasks();
                         break;
 
                     case 9:
-                        Console.WriteLine(" 9: Просмотреть всех сотрудников"); // 
+                        Console.WriteLine("\n 9: Просмотреть всех работников \n"); 
                         ShowAllWorkers();
                         break;
 
                     case 10:
-                        Console.WriteLine(" 10: Завершить работу"); // 
+                        Console.WriteLine("\n 10: Завершить работу \n"); 
                         break;
                 }
             }
@@ -125,7 +133,7 @@ namespace TestTask1.Classes
             string password = Console.ReadLine();
 
             int isWorker = -1;
-            Console.WriteLine("Новый сотрудник менеджер? \n (0 - да, 1 - нет)");
+            Console.WriteLine("\n Новый сотрудник менеджер? \n (0 - да, 1 - нет)");
             while (!(isWorker == 0 || isWorker == 1))
             {
                 string mid = Console.ReadLine();
@@ -135,20 +143,26 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Используйте только указанные выше номера вариантов. Повторите ввод числа: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                     continue;
                 }
 
                 if(!(isWorker == 0 || isWorker == 1))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Введите 1 или 0: ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                   
             }
 
             //через фабрику создаем работника
             var newEmployee = EmployeeFactory.CreateEmployee(0, login, password, isWorker);
 
-            //и сохраняем в базу данных 
+            //и сохраняем в базу данных. Здесь и далее всё из класса DBDataAccess - операции работы с БД
             DBDataAccess.SaveNewEmployee(newEmployee, isWorker);
-
         }
 
         public static void CreateNewTask()
@@ -160,7 +174,9 @@ namespace TestTask1.Classes
                 taskTitle = Console.ReadLine();
                 if(taskTitle =="")
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Обнаружено пустое поле. Введите задачу еще раз: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -175,7 +191,9 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Введите номер проекта: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -186,11 +204,11 @@ namespace TestTask1.Classes
                 description = Console.ReadLine();
                 if (description == "")
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Обнаружено пустое поле. Введите описание еще раз: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
-
-
 
             Console.WriteLine("\n Ведите текущий статус задачи (0 - to do, 1 - in progress, 2 - done): ");
             int status = -1;
@@ -203,12 +221,18 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Используйте только указанные выше номера вариантов. Повторите ввод числа: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                     continue;
                 }
 
                 if (!(status == 0 || status == 1 || status == 2))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Введите 0, 1 или 2: ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
             }
 
             Console.WriteLine("Введите ID назначенного сотрудника: ");
@@ -222,7 +246,9 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Введите ID сотрудника: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -237,7 +263,6 @@ namespace TestTask1.Classes
             {
                 DBDataAccess.SaveNewTask(newTask);
             }
-          
         }
 
         public static void AssignTask()
@@ -264,7 +289,9 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Используйте только номер для указания задачи. Повторите ввод числа: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -287,7 +314,9 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Используйте только номер для указания работника. Повторите ввод числа: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -316,7 +345,9 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Используйте только номер для указания задачи. Повторите ввод числа: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -356,7 +387,9 @@ namespace TestTask1.Classes
                 }
                 catch (Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Ошибка ввода. Используйте только номер для указания ID сотрудника. Повторите ввод числа: ");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -367,7 +400,6 @@ namespace TestTask1.Classes
             }
 
             DBDataAccess.DropUser(workerId);
-
         }
 
         public static void ShowActivityLog()
@@ -384,8 +416,6 @@ namespace TestTask1.Classes
             {
                 Console.WriteLine($"\t ID: {w.Id} \n\t Логин: {w.Login}\n\n");
             }
-        }
-
-        
+        }        
     }
 }

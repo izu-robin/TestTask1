@@ -22,9 +22,7 @@ namespace TestTask1.Classes
         private DBDataAccess()
         {
             ConnectionString = @"URI=file:ManagingSystemDB.db";
-            //Console.WriteLine("\t связь с базой установлена");
         }
-
 
         public static Employee Authorize( ref int isWorker)
         {
@@ -44,7 +42,9 @@ namespace TestTask1.Classes
 
                 if (login == "" || password == "")
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("\t Обнаружены пустые поля, повторите ввод. \n");
+                    Console.ForegroundColor = ConsoleColor.White;
                     continue;
                 }
                 success = 1;
@@ -88,7 +88,9 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Пользователь не авторизирован: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             var found = EmployeeFactory.CreateEmployee( id, login, password, isWorker);
@@ -123,16 +125,22 @@ namespace TestTask1.Classes
             {
                 if (ex.Message == "constraint failed\r\nUNIQUE constraint failed: Employees.login")
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Такой логин уже занят. Выберите другой логин и повторите операцию. ");
+                    Console.ForegroundColor = ConsoleColor.White;
                     return;
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Не удалось сохранить нового сотрудника в базу данных: {ex.Message}");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
-            Console.WriteLine("Новый сотрудник добавлен.");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n Новый сотрудник добавлен. \n");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static bool CheckExistingEmployee(int id)
@@ -153,7 +161,9 @@ namespace TestTask1.Classes
 
                         if (!reader.HasRows)
                         {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Не найден работник с этим ID. Проверьте данные и повторите ввод.");
+                            Console.ForegroundColor = ConsoleColor.White;
                             return false;
                         }
                         reader.Close(); //вот из-за него (без него), открытого но не очищенного и незакрытого было database closed
@@ -164,7 +174,9 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             return true;
@@ -200,7 +212,9 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             return true;
@@ -208,7 +222,6 @@ namespace TestTask1.Classes
 
         public static void SaveNewTask(Task t)
         {
-
             string connectionString = Instance.ConnectionString;
 
             string sql = "INSERT INTO Tasks (ProjectId, Title, Description, Status, WorkerId) VALUES (@ProjectId, @Title, @Description, @Status, @WorkerId)";
@@ -233,8 +246,14 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n\t Задача сохранена. \n");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static List<Worker> FindAllWorkers()
@@ -297,7 +316,16 @@ namespace TestTask1.Classes
                         t.Title= reader.GetString(2);   
                         t.Description= reader.GetString(3);
                         t.Status=reader.GetInt32(4);
-                        t.WorkerId=reader.GetInt32(5);
+
+                        if(reader.IsDBNull(5))
+                        {
+                            t.WorkerId = 0;
+                        }
+                        else 
+                        {
+                            t.WorkerId = reader.GetInt32(5);
+                        }
+                            
 
                         taskList.Add(t);
                     }
@@ -307,13 +335,14 @@ namespace TestTask1.Classes
             }
             catch(Exception ex) 
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             return taskList;
-
         }
-        //--------------------------------------------------------------------------------------------------
+ 
         public static void ReassignTask(int taskId, int workerId)
         {
             string connectionString = Instance.ConnectionString;
@@ -333,18 +362,20 @@ namespace TestTask1.Classes
                         command.ExecuteNonQuery();
 
                     }
-                    //SQLiteConnection.Close();
+                    SQLiteConnection.Close();
 
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Задача обновлена.");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
-            
         }
-
 
         public static void DropTask(int taskId)
         {
@@ -366,14 +397,17 @@ namespace TestTask1.Classes
                     }
                     SQLiteConnection.Close();
 
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Задача удалена.");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
-
         }
 
         public static void DropUser(int workerId)
@@ -396,40 +430,16 @@ namespace TestTask1.Classes
                     }
                     SQLiteConnection.Close();
 
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Сотрудник удален.");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        public static void FindAllActivity()
-        {
-            string connectionString = Instance.ConnectionString;
-            string sql = "SELECT Actions.* FROM Actions";
-
-            try
-            {
-                using (SQLiteConnection SQLiteConnection = new SQLiteConnection(connectionString))
-                {
-                    SQLiteConnection.Open();
-
-                    using (SQLiteCommand command = new SQLiteCommand(sql, SQLiteConnection))
-                    {
-                        using var reader = command.ExecuteReader();
-
-                        while (reader.Read())
-                        {
-                            //забиваем полученное по полям объекта
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
         }
 
@@ -448,7 +458,6 @@ namespace TestTask1.Classes
 
                     using (SQLiteCommand command = new SQLiteCommand(sql, SQLiteConnection))
                     {
-
                         command.Parameters.AddWithValue("@Id", id);
 
                         using var reader = command.ExecuteReader();
@@ -472,17 +481,16 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
-
             return tasksList;
-
         }
 
         public static void UpdateTaskStatus(int taskId, int status, int workerId)
         {
-
             string connectionString = Instance.ConnectionString;
             string sql = "UPDATE Tasks SET Status = @Status WHERE Id = @Id";
 
@@ -500,14 +508,16 @@ namespace TestTask1.Classes
                         command.ExecuteNonQuery();
 
                     }
-                    //SQLiteConnection.Close();
+                    SQLiteConnection.Close();
 
-                    Console.WriteLine("Задача обновлена.");
+                    Console.WriteLine("\nЗадача обновлена.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             LogAction(new Action(workerId, taskId, DateTime.Now.ToString(), status));
@@ -538,11 +548,15 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Задача #{a.TaskId} получила статус {Task.ReturnStatus(a.NewStatus)}");
             Console.WriteLine($"Изменение сохранено в истории действий.");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void ReadLog()
@@ -570,8 +584,24 @@ namespace TestTask1.Classes
                             a.TaskId = reader.GetInt32(2);
                             a.Title=reader.GetString(3);
                             a.NewStatus = reader.GetInt32(4);
-                            a.WorkerId= reader.GetInt32(5);
-                            a.WorkerLogin= reader.GetString(6); 
+
+                            if(reader.IsDBNull(5))
+                            {
+                                a.WorkerId = 0;
+                            }
+                            else
+                            {
+                                a.WorkerId = reader.GetInt32(5);
+                            }
+
+                            if(reader.IsDBNull(6))
+                            {
+                                a.WorkerLogin = " Удаленный пользователь";
+                            }
+                            else
+                            {
+                                a.WorkerLogin = reader.GetString(6);
+                            }
 
                             actionLog.Add(a);
                         }
@@ -584,7 +614,9 @@ namespace TestTask1.Classes
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Ошибка соединения с базой данных: {ex.Message}");
+                Console.ForegroundColor = ConsoleColor.White;
             }
 
             if(actionLog.Count == 0)
@@ -597,69 +629,6 @@ namespace TestTask1.Classes
             {
                 a.PrintAction();
             }
-
         }
-
-        ////------------------------------------------ удалить потом надо, пока что справочныйф угол ------------------------------------
-        //static void AddNewManager() //сырое из первых попыток, но по итогу работает. 
-        //    {        //абсолютная ссылка
-        //             //string ConnectionString = @"Data Source=L:\Programming\Codin\C#\TestTask1\ManagingSystemDB.db";
-
-        //        // блять это абсолютная ссылка на дебажную версию
-        //        string baseDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-        //        // и строим абсолютную ссылку с подобранной директорией
-        //        string dbPath = Path.Combine(baseDirectory, "ManagingSystemDB.db");
-
-        //        //string ConnectionString = @"Data Source=ManagingSystemDB.db;FailIfMissing=True";
-        //        //{dbPath}
-
-
-        //        string dbfile = @"URI=file:ManagingSystemDB.db";     // еще такой вариант, тоже все в дебажную версию
-        //        SQLiteConnection connection = new SQLiteConnection(dbfile);
-
-
-        //        string addManager = @"INSERT INTO Managers (login, password) 
-        //                          VALUES (@Login, @Password)";
-
-
-
-        //        try //вот сюда включать всё что работает с базой данных
-        //        {
-        //            using (SQLiteConnection SQLiteConnection = new SQLiteConnection(dbfile))
-        //            {
-        //                SQLiteConnection.Open();
-
-        //                using (SQLiteCommand command = new SQLiteCommand(addManager, SQLiteConnection))
-        //                {
-        //                    command.Parameters.AddWithValue("@Login", "admin1");
-        //                    command.Parameters.AddWithValue("@Password", "passwoord");
-
-        //                    int rowsChanged = command.ExecuteNonQuery();
-        //                    Console.WriteLine($"Изменена {rowsChanged} строка");
-        //                }
-
-        //                Console.WriteLine("Creation succeeded!");
-        //                SQLiteConnection.Close();
-        //                Console.Read();
-        //            }
-        //        }
-        //        catch (SQLiteException ex)
-        //        {
-        //            if (ex.Message == "constraint failed\r\nUNIQUE constraint failed: Managers.login")
-        //                Console.WriteLine("Такой логин уже занят. Повторите ввод: ");
-        //            else
-        //                Console.WriteLine($"Ошибка подключения базы данных: {ex.Message}");
-
-        //        }
-        //    }
-        
-
-
-        
-
-
-
-
     }
 }

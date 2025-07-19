@@ -42,10 +42,10 @@ namespace TestTask1.Classes
             {
                 case 0:
                 default:
-                    return "To_Do";
+                    return "To do";
                     
                 case 1:
-                    return "In_Progress";
+                    return "In progress";
 
                 case 2:
                     return "Done";
@@ -54,8 +54,7 @@ namespace TestTask1.Classes
         }
 
         public void PrintTask()
-        {
-                
+        {   
             if(this.Id==0)
             {
                 Console.WriteLine($"\n\t Задача: {this.Title}\n\t Связанный проект: {this.ProjectId}\n\t Назначенный работник: {this.WorkerId}\n\t Детали: {this.Description}\n\t Статус: {ReturnStatus(this.Status)}\n");

@@ -12,15 +12,18 @@ namespace TestTask1.Classes
         public string Login { get; set; }
         public string Password { get; set; }
 
-
         public virtual void ShowActions()
         {
-            Console.WriteLine("\n\t Выберите действие: ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\n\t Выберите действие: \n");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public virtual void ActionsTree()
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write("\n Введите номер действия: ");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public Employee() {}
@@ -28,9 +31,6 @@ namespace TestTask1.Classes
         public Employee(string login)
         {
             Login = login;
-            //Password = Password;
         }
-
-
     }
 }
